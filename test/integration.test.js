@@ -11,13 +11,52 @@ describe("Fibonacci Microservice Integration", () => {
   const peer = new PeerRPCClient(link, {});
   peer.init();
 
-  // Stop the peer and link after tests
   afterAll(() => {
-    peer.stop(); // This should clean up the PeerRPCClient resources
-    link.stop(); // Stop the link to prevent open handles
+    peer.stop();
+    link.stop();
   });
 
-  test("should get Fibonacci result from the service", (done) => {
+  // Error handling tests
+  test("should return an error for negative input", (done) => {
+    peer.request(
+      "fibonacci_worker",
+      { number: -1 },
+      { timeout: 10000 },
+      (err, result) => {
+        expect(err).toBeTruthy();
+        expect(err.message).toBe(
+          "Invalid input. Please provide a non-negative number."
+        );
+        done();
+      }
+    );
+  });
+
+  test("should return an error for non-numeric input", (done) => {
+    peer.request(
+      "fibonacci_worker",
+      { number: "not_a_number" },
+      { timeout: 10000 },
+      (err, result) => {
+        expect(err).toBeTruthy();
+        expect(err.message).toBe(
+          "Invalid input. Please provide a non-negative number."
+        );
+        done();
+      }
+    );
+  });
+
+  // Concurrent requests test
+  test("should handle multiple concurrent requests", (done) => {
+    let completedRequests = 0;
+
+    const checkDone = () => {
+      if (++completedRequests === 3) {
+        done();
+      }
+    };
+
     peer.request(
       "fibonacci_worker",
       { number: 10 },
@@ -25,7 +64,29 @@ describe("Fibonacci Microservice Integration", () => {
       (err, result) => {
         expect(err).toBeNull();
         expect(result).toBe(55);
-        done();
+        checkDone();
+      }
+    );
+
+    peer.request(
+      "fibonacci_worker",
+      { number: 15 },
+      { timeout: 10000 },
+      (err, result) => {
+        expect(err).toBeNull();
+        expect(result).toBe(610);
+        checkDone();
+      }
+    );
+
+    peer.request(
+      "fibonacci_worker",
+      { number: 20 },
+      { timeout: 10000 },
+      (err, result) => {
+        expect(err).toBeNull();
+        expect(result).toBe(6765);
+        checkDone();
       }
     );
   });
