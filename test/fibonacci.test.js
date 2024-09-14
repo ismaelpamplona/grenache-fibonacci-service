@@ -1,6 +1,4 @@
-function fibonacci(n) {
-  return null;
-}
+const fibonacci = require("../src/fibonacci");
 
 describe("Fibonacci Service", () => {
   test("should return 1 for n = 1", () => {
@@ -11,7 +9,8 @@ describe("Fibonacci Service", () => {
     expect(fibonacci(10)).toBe(55);
   });
 
-  test("should return 1 for n = 0", () => {
-    expect(fibonacci(0)).toBe(1);
+  test("should return 0 for n = 0", () => {
+    // Update this line
+    expect(fibonacci(0)).toBe(0);
   });
 });
