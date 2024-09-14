@@ -23,7 +23,7 @@ peer.request(
   { timeout: 10000 },
   (err, result) => {
     if (err) {
-      console.error("Error:", err);
+      console.error("Error:", err.message || err);
       process.exit(1);
     }
     console.log(`Fibonacci(${inputNumber}) = ${result}`);
@@ -31,4 +31,4 @@ peer.request(
   }
 );
 
-console.error("🔗 Client request sent... awaiting response!");
+console.log("🔗 Client request sent... awaiting response!");
