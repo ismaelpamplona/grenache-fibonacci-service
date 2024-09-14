@@ -17,18 +17,19 @@ service.listen(1337);
 const intervalId = setInterval(() => {
   link.announce("fibonacci_worker", service.port, {});
 }, 1000);
-
-intervalId.unref(); // prevent setInterval from keeping the Node.js process running
+intervalId.unref();
 
 service.on("request", (rid, key, payload, handler) => {
-  const result = fibonacci(payload.number);
-  handler.reply(null, result);
-});
+  if (typeof payload.number !== "number" || payload.number < 0) {
+    return handler.reply(
+      new Error("Invalid input. Please provide a non-negative number.")
+    );
+  }
 
-process.on("SIGTERM", () => {
-  clearInterval(intervalId);
-  link.stop();
-  process.exit(0);
+  try {
+    const result = fibonacci(payload.number);
+    handler.reply(null, result);
+  } catch (err) {
+    handler.reply(err);
+  }
 });
-
-console.log("🚀 Server is running...");
