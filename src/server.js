@@ -18,7 +18,7 @@ const intervalId = setInterval(() => {
   link.announce("fibonacci_worker", service.port, {});
 }, 1000);
 
-intervalId.unref(); // Prevent setInterval from keeping the Node.js process running
+intervalId.unref(); // prevent setInterval from keeping the Node.js process running
 
 service.on("request", (rid, key, payload, handler) => {
   const result = fibonacci(payload.number);
@@ -30,3 +30,5 @@ process.on("SIGTERM", () => {
   link.stop();
   process.exit(0);
 });
+
+console.log("🚀 Server is running...");
