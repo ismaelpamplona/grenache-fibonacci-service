@@ -26,10 +26,12 @@ service.on("request", (rid, key, payload, handler) => {
     );
   }
 
-  try {
-    const result = fibonacci(payload.number);
-    handler.reply(null, result);
-  } catch (err) {
-    handler.reply(err);
-  }
+  setImmediate(() => {
+    try {
+      const result = fibonacci(payload.number);
+      handler.reply(null, result);
+    } catch (err) {
+      handler.reply(err);
+    }
+  });
 });
